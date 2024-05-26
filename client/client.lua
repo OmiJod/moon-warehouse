@@ -524,20 +524,20 @@ end)
 CreateThread(function()
     while true do
         for k, v in pairs(Config.WareHouses) do 
-            for k, v in pairs(v) do
-                local name = "Warehouse "..k
+            for l, j in pairs(v) do
+                local name = "Warehouse "..l
                 QBCore.Functions.TriggerCallback('moon-warehouse:server:warehousepurchased', function(result)
                     if result then
                         IsOwned2 = true
                     else
                         IsOwned2 = false
                     end
-                end, k)
+                end, l)
                 Wait(400)
                 if not IsOwned2 then
-                    makeBlip({coords = v, sprite = 474, col = 2, name = name})
+                    makeBlip({coords = j, sprite = 474, col = 2, name = name})
                 elseif IsOwned2 then
-                    makeBlip({coords = v, sprite = 474, col = 5, name = name})
+                    makeBlip({coords = j, sprite = 474, col = 5, name = name})
                 end
             end
         end
@@ -547,26 +547,28 @@ end)
 
 CreateThread(function()
     for k,v in pairs(Config.WareHouses) do 
-        for k,v in pairs(v) do
-            local name = 'WareHouse'.. k
-            Targets[name] =
-            exports['qb-target']:AddBoxZone(name, v.xyz, 2.0, 2.0, {
-                heading = v.w,
-                debugPoly = false,
-                minZ = v.z - 1,
-                maxZ = v.z + 4,
-            }, {
-                options = {
-                    {
-                        action = function()
-                            TriggerEvent("moon-warehouse:client:openmenu", k)
-                        end,
-                        icon = "fas fa-clipboard",
-                        label = 'Interact',
-                    },
-                },
-                distance = 3.0
-            })
+        for l,j in pairs(v) do
+            local name = 'WareHouse'.. l
+            Targets[name] = 
+		exports['qb-target']:AddBoxZone(name, vector3(j.x, j.y, j.z), 2.0, 2.0, {
+			name = name,
+			heading = j.w,
+			minZ = j.z - 1,
+			maxZ = j + 4,
+			debugPoly = false,
+		}, {
+			options = {
+				{
+					type = "client",
+					action = function()
+                            			TriggerEvent("moon-warehouse:client:openmenu", l)
+                        		end,
+					icon = "fas fa-clipboard",
+                        		label = 'Interact',
+				},
+			},
+			distance = 3.0
+		})
         end
     end
 end)
