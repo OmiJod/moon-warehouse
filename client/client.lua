@@ -549,25 +549,26 @@ CreateThread(function()
     for k,v in pairs(Config.WareHouses) do 
         for l,j in pairs(v) do
             local name = 'WareHouse'.. l
-            Targets[name] = exports['qb-target']:AddBoxZone(name, vector3(j.x, j.y, j.z), 2.0, 2.0, {
-				name = name,
-				heading = j.w,
-				minZ = j.z - 1,
-				maxZ = j + 4,
-				debugPoly = false,
-			}, {
-				options = {
-					{
-						type = "client",
-						action = function()
-                            TriggerEvent("moon-warehouse:client:openmenu", l)
-                        end,
-						icon = "fas fa-clipboard",
-                        label = 'Interact',
-					},
+            Targets[name] = 
+		exports['qb-target']:AddBoxZone(name, vector3(j.x, j.y, j.z), 2.0, 2.0, {
+			name = name,
+			heading = j.w,
+			minZ = j.z - 1,
+			maxZ = j + 4,
+			debugPoly = false,
+		}, {
+			options = {
+				{
+					type = "client",
+					action = function()
+                            			TriggerEvent("moon-warehouse:client:openmenu", l)
+                        		end,
+					icon = "fas fa-clipboard",
+                        		label = 'Interact',
 				},
-				distance = 3.0
-			})
+			},
+			distance = 3.0
+		})
         end
     end
 end)
