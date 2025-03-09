@@ -232,24 +232,21 @@ end)
 RegisterNetEvent("moon-warehouse:client:openwarehousestash", function(id)
     local warehouseid = id
     if Config.inventory == "qb" then
-        QBCore.Functions.TriggerCallback('moon-warehouse:server:ispwdset', function(result)
-            if result then
-                isPwdSet = true
-            else
-                isPwdSet = false
-            end
-            Wait(100)
+        QBCore.Functions.TriggerCallback('moon-warehouse:server:ispwdset', function(isPwdSet)
             if isPwdSet then
                 local input = lib.inputDialog('Enter Password for Warehouse #'..warehouseid, {
-                    { type = 'input', label = 'Enter Password', password = true, disabled = false },
+                    { type = 'input', label = 'Enter Password', password = true }
                 })
-                if input ~= nil then
+                
+                if input and input[1] then
                     QBCore.Functions.TriggerCallback('moon-warehouse:server:getdetails', function(result)
-                        if result.password == input[1] then
-                            local stashname = "warehouse"..warehouseid.."_moon"
-                            TriggerEvent("inventory:client:SetCurrentStash", stashname) 
-                            TriggerServerEvent("inventory:server:OpenInventory", "stash", stashname, 
-                            { maxweight = result.stashsize, slots = result.slots }) 
+                        if result and result.password == input[1] then
+                            local stashname = "warehouse_"..warehouseid
+                            TriggerEvent("inventory:client:SetCurrentStash", stashname)
+                            TriggerServerEvent("inventory:server:OpenInventory", "stash", stashname, {
+                                maxweight = result.stashsize or 100000,
+                                slots = result.slots or 50
+                            })
                         else
                             QBCore.Functions.Notify("Wrong Password", "error", 3000)
                         end
@@ -257,21 +254,27 @@ RegisterNetEvent("moon-warehouse:client:openwarehousestash", function(id)
                 else
                     QBCore.Functions.Notify("You Cancelled the Process", "error", 2500)
                 end
-            elseif not isPwdSet then
+            else
                 local input = lib.inputDialog('Set Password for Warehouse #'..warehouseid, {
-                    { type = 'input', label = 'Enter Password', password = true, disabled = false },
+                    { type = 'input', label = 'Enter Password', password = true }
                 })
-                if input ~= nil then
-                    TriggerEvent("moon-warehouse:client:client:updatepassword", { location = warehouseid, password = input[1]})
+                
+                if input and input[1] then
+                    TriggerServerEvent("moon-warehouse:server:updatepassword", warehouseid, input[1])
                 else
                     QBCore.Functions.Notify("You Cancelled the Process", "error", 2500)
                 end
             end
         end, warehouseid)
+
     elseif Config.inventory == "ox" then
         QBCore.Functions.TriggerCallback('moon-warehouse:server:getdetails', function(result)
-            local stashname = "warehouse"..warehouseid.."_moon"
-            TriggerServerEvent('moon:warehouse:server:oxinventorystash', warehouseid, stashname, result.stashsize, result.slots)
+            if result then
+                local stashname = "warehouse_"..warehouseid
+                TriggerServerEvent('moon-warehouse:server:oxinventorystash', warehouseid, stashname, result.stashsize, result.slots)
+            else
+                QBCore.Functions.Notify("Failed to retrieve warehouse details", "error", 3000)
+            end
         end, warehouseid)
     end
 end)
